@@ -117,30 +117,47 @@ var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
 
 
+// var materials = [
+//   loadTexture( 'img/mars.jpg' ), // right
+//   loadTexture( 'img/mars.jpg' ), // left
+//   loadTexture( 'img/mars.jpg' ), // top
+//   loadTexture( 'img/mars.jpg' ), // bottom
+//   loadTexture( 'img/mars.jpg' ), // back
+//   loadTexture( 'img/mars.jpg' )  //front
+// ];
+
+// function loadTexture( path ) {
+//   var texture = new THREE.Texture( texture_placeholder );
+//   var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
+
+//   var image = new Image();
+//   image.onload = function () {
+
+//     texture.image = this;
+//     texture.needsUpdate = true;
+
+//   };
+//   image.src = path;
+//   return material;
+// }
+
 // Add a repeating grid as a skybox.
-var boxSize = 5;
+// var boxSize = 5;
 var loader = new THREE.TextureLoader();
-loader.load('img/box.png', onTextureLoaded);
+loader.load('img/wall.jpg', onTextureLoaded);
 
 function onTextureLoaded(texture) {
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(boxSize, boxSize);
+  var geometry = new THREE.BoxGeometry(200, 100, 100);
 
-  var geometry = new THREE.BoxGeometry(boxSize, boxSize, boxSize);
-  var material = new THREE.MeshBasicMaterial({
-    map: texture,
-    color: 0x01BE00,
-    side: THREE.BackSide
-  });
+  // create the material, using a texture of mars
+  var material = new THREE.MeshBasicMaterial();
+  material.map = texture;
+  material.side = THREE.BackSide;
 
-  // Align the skybox to the floor (which is at y=0).
-  skybox = new THREE.Mesh(geometry, material);
-  skybox.position.y = boxSize/2;
+  // create the mesh based on geometry and material
+  var mesh = new THREE.Mesh(geometry, material);
+  var skybox = new THREE.Mesh(geometry, material);
   scene.add(skybox);
-
-  // For high end VR devices like Vive and Oculus, take into account the stage
-  // parameters provided.
   setupStage();
 }
 
@@ -153,15 +170,15 @@ var params = {
 var manager = new WebVRManager(renderer, effect, params);
 
 // Create 3D objects.
-var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-var material = new THREE.MeshNormalMaterial();
-var cube = new THREE.Mesh(geometry, material);
+// var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+// var material = new THREE.MeshNormalMaterial();
+// var cube = new THREE.Mesh(geometry, material);
 
-// Position cube mesh to be right in front of you.
-cube.position.set(0, controls.userHeight, -1);
+// // Position cube mesh to be right in front of you.
+// cube.position.set(0, controls.userHeight, -1);
 
-// Add cube mesh to your three.js scene
-scene.add(cube);
+// // Add cube mesh to your three.js scene
+// scene.add(cube);
 
 // Kick off animation loop
 requestAnimationFrame(animate);
@@ -176,7 +193,7 @@ function animate(timestamp) {
   lastRender = timestamp;
 
   // Apply rotation to cube mesh
-  cube.rotation.y += delta * 0.0006;
+  // cube.rotation.y += delta * 0.0006;
 
   // Update VR headset position and apply to camera.
   controls.update();
