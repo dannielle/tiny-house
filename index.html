@@ -94,62 +94,21 @@ WebVRConfig = {
 
 
 <script>
-// Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
-// Only enable it if you actually need to.
-var renderer = new THREE.WebGLRenderer({antialias: true});
-renderer.setPixelRatio(window.devicePixelRatio);
 
-// Append the canvas element created by the renderer to document body element.
-document.body.appendChild(renderer.domElement);
+var renderer, scene, camera, controls, effect;
+init();
 
-// Create a three.js scene.
-var scene = new THREE.Scene();
-
-// Create a three.js camera.
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-
-// Apply VR headset positional data to camera.
-var controls = new THREE.VRControls(camera);
-controls.standing = true;
-
-// Apply VR stereo rendering to renderer.
-var effect = new THREE.VREffect(renderer);
-effect.setSize(window.innerWidth, window.innerHeight);
+// Create a VR manager helper to enter and exit VR mode.
+var manager = createWebVRManager();
 
 
-// var materials = [
-//   loadTexture( 'img/mars.jpg' ), // right
-//   loadTexture( 'img/mars.jpg' ), // left
-//   loadTexture( 'img/mars.jpg' ), // top
-//   loadTexture( 'img/mars.jpg' ), // bottom
-//   loadTexture( 'img/mars.jpg' ), // back
-//   loadTexture( 'img/mars.jpg' )  //front
-// ];
-
-// function loadTexture( path ) {
-//   var texture = new THREE.Texture( texture_placeholder );
-//   var material = new THREE.MeshBasicMaterial( { map: texture, overdraw: 0.5 } );
-
-//   var image = new Image();
-//   image.onload = function () {
-
-//     texture.image = this;
-//     texture.needsUpdate = true;
-
-//   };
-//   image.src = path;
-//   return material;
-// }
-
-// Add a repeating grid as a skybox.
-// var boxSize = 5;
+// Create 3D objects.
 var loader = new THREE.TextureLoader();
 loader.load('img/wall.jpg', onTextureLoaded);
 
 function onTextureLoaded(texture) {
   var geometry = new THREE.BoxGeometry(200, 100, 100);
 
-  // create the material, using a texture of mars
   var material = new THREE.MeshBasicMaterial();
   material.map = texture;
   material.side = THREE.BackSide;
@@ -160,15 +119,6 @@ function onTextureLoaded(texture) {
   scene.add(skybox);
 }
 
-
-// Create a VR manager helper to enter and exit VR mode.
-var params = {
-  hideButton: false, // Default: false.
-  isUndistorted: false // Default: false.
-};
-var manager = new WebVRManager(renderer, effect, params);
-
-// Create 3D objects.
 var geometry = new THREE.BoxGeometry(200, 1, 100);
 var material = new THREE.MeshNormalMaterial();
 var cube = new THREE.Mesh(geometry, material);
@@ -179,15 +129,20 @@ cube.position.set(0, -50, 0);
 // // Add cube mesh to your three.js scene
 scene.add(cube);
 
+
 // Kick off animation loop
-requestAnimationFrame(animate);
+render();
+
+
+var display;
+setupStage();
 
 window.addEventListener('resize', onResize, true);
 window.addEventListener('vrdisplaypresentchange', onResize, true);
 
 // Request animation frame loop function
 var lastRender = 0;
-function animate(timestamp) {
+function render(timestamp) {
   var delta = Math.min(timestamp - lastRender, 500);
   lastRender = timestamp;
 
@@ -200,7 +155,7 @@ function animate(timestamp) {
   // Render the scene through the manager.
   manager.render(scene, camera, timestamp);
 
-  requestAnimationFrame(animate);
+  requestAnimationFrame(render);
 }
 
 function onResize(e) {
@@ -208,10 +163,6 @@ function onResize(e) {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
 }
-
-var display;
-
-setupStage();
 // Get the HMD, and if we're dealing with something that specifies
 // stageParameters, rearrange the scene.
 function setupStage() {
@@ -241,6 +192,40 @@ function setStageDimensions(stage) {
   // Place the cube in the middle of the scene, at user height.
   cube.position.set(0, controls.userHeight, 0);
 }
+
+
+function init() {
+  // Setup three.js WebGL renderer. Note: Antialiasing is a big performance hit.
+  // Only enable it if you actually need to.
+  renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  // Append the canvas element created by the renderer to document body element.
+  document.body.appendChild(renderer.domElement);
+
+  // Create a three.js scene.
+  scene = new THREE.Scene();
+
+  // Create a three.js camera.
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
+
+  // Apply VR headset positional data to camera.
+  controls = new THREE.VRControls(camera);
+  controls.standing = true;
+
+  // Apply VR stereo rendering to renderer.
+  effect = new THREE.VREffect(renderer);
+  effect.setSize(window.innerWidth, window.innerHeight);
+}
+
+function createWebVRManager(){
+  var params = {
+    hideButton: false, // Default: false.
+    isUndistorted: false // Default: false.
+  };
+  return new WebVRManager(renderer, effect, params);
+}
+
 
 </script>
 
