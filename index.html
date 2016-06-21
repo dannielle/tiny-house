@@ -92,6 +92,7 @@ WebVRConfig = {
   -->
 <script src="build/webvr-manager.js"></script>
 
+<script src="js/loaders/ColladaLoader.js"></script>
 
 <script>
 
@@ -103,32 +104,31 @@ var manager = createWebVRManager();
 
 
 // Create 3D objects.
-var loader = new THREE.TextureLoader();
-loader.load('img/wall.jpg', onTextureLoaded);
+var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+scene.add( light );
 
-function onTextureLoaded(texture) {
-  var geometry = new THREE.BoxGeometry(200, 100, 100);
+var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+        directionalLight.position.x = Math.random() - 0.5;
+        directionalLight.position.y = Math.random() - 0.5;
+        directionalLight.position.z = Math.random() - 0.5;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
 
-  var material = new THREE.MeshBasicMaterial();
-  material.map = texture;
-  material.side = THREE.BackSide;
 
-  // create the mesh based on geometry and material
-  var mesh = new THREE.Mesh(geometry, material);
-  var skybox = new THREE.Mesh(geometry, material);
-  scene.add(skybox);
-}
-
-var geometry = new THREE.BoxGeometry(200, 1, 100);
-var material = new THREE.MeshNormalMaterial();
-var cube = new THREE.Mesh(geometry, material);
-
-// // Position cube mesh to be right in front of you.
-cube.position.set(0, -50, 0);
-
-// // Add cube mesh to your three.js scene
-scene.add(cube);
-
+var loader = new THREE.ColladaLoader();
+loader.options.convertUpAxis = true;
+loader.load(
+  'models/House.dae',
+  function(collada) {
+    var model = collada.scene;
+    model.position.x = -3;
+    model.position.y = -1;
+    model.position.z = -15;
+    scene.add(model);
+  },
+  function(xhr) {
+    console.log( (xhr.loaded / xhr.total * 100) + '% loaded');
+  })
 
 // Kick off animation loop
 render();
