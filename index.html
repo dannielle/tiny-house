@@ -103,27 +103,36 @@ init();
 var manager = createWebVRManager();
 
 
+setupLights();
+
 // Create 3D objects.
-var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-scene.add( light );
 
-var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
-        directionalLight.position.x = Math.random() - 0.5;
-        directionalLight.position.y = Math.random() - 0.5;
-        directionalLight.position.z = Math.random() - 0.5;
-        directionalLight.position.normalize();
-        scene.add( directionalLight );
-
+var imagePrefix = "img/dawnmountain-";
+var directions  = ["xpos", "xneg", "ypos", "yneg", "zpos", "zneg"];
+var imageSuffix = ".png";
+var materialsArray = [];
+for (var i = 0; i < 6; i++) {
+  materialsArray.push( new THREE.MeshBasicMaterial({
+    map: THREE.ImageUtils.loadTexture( imagePrefix + directions[i] + imageSuffix ),
+    side: THREE.BackSide
+  }) )
+}
+var skyGeometry = new THREE.CubeGeometry( 5000, 5000, 5000 );
+var skyMaterial = new THREE.MeshFaceMaterial( materialsArray );
+var skyBox = new THREE.Mesh( skyGeometry, skyMaterial );
+scene.add( skyBox );
 
 var loader = new THREE.ColladaLoader();
 loader.options.convertUpAxis = true;
+loader.setPreferredShading(THREE.SmoothShading);
 loader.load(
-  'models/House.dae',
+  'models/kitchen.dae',
   function(collada) {
     var model = collada.scene;
-    model.position.x = -3;
-    model.position.y = -1;
-    model.position.z = -15;
+
+    model.position.x = 0;
+    model.position.y = -5;
+    model.position.z = -5;
     scene.add(model);
   },
   function(xhr) {
@@ -226,6 +235,17 @@ function createWebVRManager(){
   return new WebVRManager(renderer, effect, params);
 }
 
+function setupLights() {
+  var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+  scene.add( light );
+
+  var directionalLight = new THREE.DirectionalLight(/*Math.random() * 0xffffff*/0xeeeeee );
+        directionalLight.position.x = 0.5;
+        directionalLight.position.y = 0.5;
+        directionalLight.position.z = 0.5;
+        directionalLight.position.normalize();
+        scene.add( directionalLight );
+}
 
 </script>
 
