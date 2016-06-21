@@ -158,7 +158,6 @@ function onTextureLoaded(texture) {
   var mesh = new THREE.Mesh(geometry, material);
   var skybox = new THREE.Mesh(geometry, material);
   scene.add(skybox);
-  setupStage();
 }
 
 
@@ -170,15 +169,15 @@ var params = {
 var manager = new WebVRManager(renderer, effect, params);
 
 // Create 3D objects.
-// var geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-// var material = new THREE.MeshNormalMaterial();
-// var cube = new THREE.Mesh(geometry, material);
+var geometry = new THREE.BoxGeometry(200, 1, 100);
+var material = new THREE.MeshNormalMaterial();
+var cube = new THREE.Mesh(geometry, material);
 
 // // Position cube mesh to be right in front of you.
-// cube.position.set(0, controls.userHeight, -1);
+cube.position.set(0, -50, 0);
 
 // // Add cube mesh to your three.js scene
-// scene.add(cube);
+scene.add(cube);
 
 // Kick off animation loop
 requestAnimationFrame(animate);
@@ -212,6 +211,7 @@ function onResize(e) {
 
 var display;
 
+setupStage();
 // Get the HMD, and if we're dealing with something that specifies
 // stageParameters, rearrange the scene.
 function setupStage() {
